@@ -1,11 +1,12 @@
 ﻿namespace ProjectManager.BL.Model
 {
-    public enum UserType : byte
+    public enum UserType
     {
-        None,
+        None = -1,
         Ordinary,
         Student,
         Teacher,
-        Company
+        Company,
+        Other
     }
 }

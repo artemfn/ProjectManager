@@ -1,10 +1,12 @@
 ﻿using Microsoft.Office.Interop.PowerPoint;
 using Microsoft.Office.Core;
 using System;
+using System.IO;
+using System.Diagnostics;
 
 namespace ProjectManager.BL.Model
 {
-    public class PowerPointFile : ProjectFile
+    public sealed class PowerPointFile : ProjectFile
     {
         private readonly Application _application;
         private readonly Presentation _presentation;
@@ -20,25 +22,63 @@ namespace ProjectManager.BL.Model
         }
 
 
-        public override void Open()
+        public override void Save()
         {
-            while (true)
+            if (!File.Exists(Path))
             {
-                try
+                while (true)
                 {
-                    _application.Presentations.Open(Path);
-                    return;
+                    try
+                    {
+                        _presentation.SaveAs(Path, PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                    }
+                    catch (IOException e)
+                    {
+                        throw new InvalidOperationException(nameof(Save), e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    _presentation.Close();
-                }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Save));
             }
         }
 
-        public override void Save()
+        public override void Open()
         {
-            _presentation.SaveAs(Path, PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+            if (File.Exists(Path))
+            {
+                while (true)
+                {
+                    try
+                    {
+                        _application.Presentations.Open(Path);
+                        return;
+                    }
+                    catch (Exception e)
+                    {
+                        _presentation.Close();
+                    }
+                }
+            }
+
+            throw new InvalidOperationException(nameof(Open));
+        }
+
+        public override void Close()
+        {
+            if (File.Exists(Path))
+            {
+                foreach (var process in Process.GetProcesses("powerpnt"))
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Close));
+            }
         }
     }
 }

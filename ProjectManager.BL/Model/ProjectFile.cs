@@ -19,6 +19,20 @@ namespace ProjectManager.BL.Model
 
         public abstract void Save();
         public abstract void Open();
+        public abstract void Close();
+
+        public void Delete()
+        {
+            if (File.Exists(Path))
+            {
+                
+                File.Delete(Path);
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Delete));
+            }
+        }
 
         public void TryDelete()
         {

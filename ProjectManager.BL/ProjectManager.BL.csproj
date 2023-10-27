@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\BinarySerializationProvider.cs" />
+    <Compile Include="Data\DirectoryController.cs" />
     <Compile Include="Model\ExcelFile.cs" />
     <Compile Include="Model\PowerPointFile.cs" />
     <Compile Include="Model\Project.cs" />

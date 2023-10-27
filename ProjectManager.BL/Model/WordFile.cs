@@ -1,6 +1,8 @@
 ﻿using Microsoft.Office.Interop.Word;
 using Microsoft.Office.Core;
 using System;
+using System.IO;
+using System.Diagnostics;
 
 namespace ProjectManager.BL.Model
 {
@@ -17,25 +19,60 @@ namespace ProjectManager.BL.Model
         }
 
 
-        public override void Open()
+        public override void Save()
         {
-            while (true)
+            if (!File.Exists(Path))
             {
                 try
                 {
-                    _application.Documents.Open(Path);
-                    return;
+                    _document.SaveAs(Path, MsoTriState.msoTrue);
                 }
-                catch (Exception e)
+                catch (IOException e)
                 {
-                    _document.Close();
+                    throw new InvalidOperationException(nameof(Save), e);
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Save));
             }
         }
 
-        public override void Save()
+        public override void Open()
         {
-            _document.SaveAs(Path, MsoTriState.msoTrue);
+            if (File.Exists(Path))
+            {
+                while (true)
+                {
+                    try
+                    {
+                        _application.Documents.Open(Path);
+                        return;
+                    }
+                    catch (Exception e)
+                    {
+                        _document.Close();
+                    }
+                }
+            }
+
+            throw new InvalidOperationException(nameof(Open));
+        }
+
+        public override void Close()
+        {
+            if (File.Exists(Path))
+            {
+                foreach (var process in Process.GetProcessesByName("winword"))
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Close));
+            }
         }
     }
 }

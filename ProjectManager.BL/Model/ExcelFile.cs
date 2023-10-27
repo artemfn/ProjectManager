@@ -1,6 +1,8 @@
 ﻿using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace ProjectManager.BL.Model
 {
@@ -20,25 +22,60 @@ namespace ProjectManager.BL.Model
         }
 
 
-        public override void Open()
+        public override void Save()
         {
-            while (true)
+            if (!File.Exists(Path))
             {
                 try
                 {
-                    _application.Workbooks.Open(Path);
-                    return;
+                    _workbook.SaveAs(Path, MsoTriState.msoTrue);
                 }
-                catch (Exception e)
+                catch (IOException e)
                 {
-                    _workbook.Close();
+                    throw new InvalidOperationException(nameof(Save), e);
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Save));
             }
         }
 
-        public override void Save()
+        public override void Open()
         {
-            _workbook.SaveAs(Path, MsoTriState.msoTrue);
+            if (File.Exists(Path))
+            {
+                while (true)
+                {
+                    try
+                    {
+                        _application.Workbooks.Open(Path);
+                        return;
+                    }
+                    catch (Exception e)
+                    {
+                        _workbook.Close();
+                    }
+                }
+            }
+
+            throw new InvalidOperationException(nameof(Open));
+        }
+
+        public override void Close()
+        {
+            if (File.Exists(Path))
+            {
+                foreach (var process in Process.GetProcesses("EXCEL"))
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(Close));
+            }
         }
     }
 }
