@@ -6,6 +6,12 @@ namespace ProjectManager.BL.Model
     [Serializable]
     public class User
     {
+        public User()
+        {
+            Projects = new List<Project>();
+        }
+
+
         public string Name { get; private set; }
         public string Password { get; private set; }
         public string Email { get; private set; }

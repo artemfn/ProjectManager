@@ -3,6 +3,7 @@ using System.IO;
 
 namespace ProjectManager.BL.Model
 {
+    [Serializable]
     public abstract class ProjectFile
     {
         public ProjectFile(string path)
@@ -14,7 +15,7 @@ namespace ProjectManager.BL.Model
         }
 
 
-        protected string Path { get; }
+        public string Path { get; }
 
 
         public abstract void Save();

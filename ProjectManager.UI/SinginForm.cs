@@ -10,6 +10,7 @@ namespace ProjectManager.UI
         private const string USERSDIRECTORYPATH = @"C:\Users\Admin\Desktop\Projects.cs\ProjectManager\ProjectManager.UI\bin\Debug\users";
 
         private readonly BinarySerializationProvider _serializationProvider = new BinarySerializationProvider();
+        private readonly DirectoryController _directoryController = new DirectoryController();
         private readonly User _user = new User();
 
         private bool _isDescriptionAdded = false;
@@ -45,7 +46,15 @@ namespace ProjectManager.UI
                 _user.Set(NameTextBox.Text, PasswordTextBox.Text, EmailTextBox.Text,
                     GetGenderValue(GenderComboBox.Text), (int)AgeNumeric.Value, _description, GetUserTypeValue(UserTypeComboBox.Text));
 
-                _serializationProvider.Save($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}", _user);
+                _directoryController.TryCreate($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}");
+                _directoryController.TryCreate($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}\Projects");
+                _serializationProvider.Save($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}\Data", _user);
+
+                MessageBox.Show("User did sing in!", "Singin", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                Hide();
+                new MainMenuForm(_user).ShowDialog();
+                Close();
             }
         }
 

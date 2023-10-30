@@ -23,6 +23,22 @@ namespace ProjectManager.BL.Data
             }
         }
 
+        public void SaveOrReplace<T>(string path, T obj)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            Save(path, obj);
+        }
+
         public T Load<T>(string path) where T : class
         {
             if (string.IsNullOrEmpty(path))

@@ -4,6 +4,7 @@ using System.IO;
 
 namespace ProjectManager.BL.Model
 {
+    [Serializable]
     public class Project
     {
         private readonly List<ProjectFile> _files;
@@ -25,7 +26,7 @@ namespace ProjectManager.BL.Model
             Name = name;
             Description = description;
 
-            CreateDirectory(DirectoryPath);
+            TryCreateDirectory(DirectoryPath);
         }
 
 
@@ -33,7 +34,7 @@ namespace ProjectManager.BL.Model
         public string Name { get; }
         public string Description { get; }
 
-        private string DirectoryPath => $"{Path}\\{Name}";
+        private string DirectoryPath => $@"{Path}\{Name}";
 
 
         public void Add(ProjectFile file)
@@ -52,24 +53,33 @@ namespace ProjectManager.BL.Model
             _files.Remove(file);
         }
 
-        public void Delete()
+        public void TryDelete()
         {
             foreach (var file in _files)
             {
-                file.TryDelete();
+                if (File.Exists(file.Path))
+                {
+                    file.TryDelete();
+                }
+            }
+
+            if (Directory.Exists(DirectoryPath))
+            {
+                Directory.Delete(DirectoryPath);
             }
         }
 
-        private void CreateDirectory(string path)
+        private void TryCreateDirectory(string path)
         {
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            else
-            {
-                throw new InvalidOperationException(nameof(path));
-            }
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }
