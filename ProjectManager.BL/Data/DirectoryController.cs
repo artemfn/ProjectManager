@@ -30,5 +30,21 @@ namespace ProjectManager.BL.Data
                 throw new InvalidOperationException(nameof(path));
             }
         }
+
+        public void TryDelete(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (Directory.Exists(path))
+            {
+                foreach (var file in Directory.GetFiles(path))
+                {
+                    File.Delete(file);
+                }
+
+                Directory.Delete(path);
+            }
+        }
     }
 }

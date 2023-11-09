@@ -1,31 +1,44 @@
 ﻿using Microsoft.Office.Interop.Word;
-using Microsoft.Office.Core;
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ProjectManager.BL.Model
 {
+    [Serializable]
     public sealed class WordFile : ProjectFile
     {
         private readonly Application _application;
         private readonly Document _document;
 
 
-        public WordFile(string path) : base(path)
+        public WordFile(string name, string path, bool visible) : base(name, path)
         {
-            _application = new Application();
-            _document = _application.Documents.Add(Visible: true);
+            _application = new Application()
+            {
+                Visible = visible
+            };
+            _document = _application.Documents.Add();
+        }
+
+        public WordFile(string fullPath, bool visible) : base(fullPath)
+        {
+            _application = new Application()
+            {
+                Visible = visible
+            };
+            _document = _application.Documents.Add();
         }
 
 
         public override void Save()
         {
-            if (!File.Exists(Path))
+            if (!File.Exists(FullPath))
             {
                 try
                 {
-                    _document.SaveAs(Path, MsoTriState.msoTrue);
+                    _document.SaveAs(FullPath);
                 }
                 catch (IOException e)
                 {
@@ -40,13 +53,13 @@ namespace ProjectManager.BL.Model
 
         public override void Open()
         {
-            if (File.Exists(Path))
+            if (File.Exists(FullPath))
             {
                 while (true)
                 {
                     try
                     {
-                        _application.Documents.Open(Path);
+                        _application.Documents.Open(FullPath, ReadOnly: false);
                         return;
                     }
                     catch (Exception e)
@@ -59,20 +72,10 @@ namespace ProjectManager.BL.Model
             throw new InvalidOperationException(nameof(Open));
         }
 
-        public override void Close()
+        public override void Dispose()
         {
-            if (File.Exists(Path))
-            {
-                foreach (var process in Process.GetProcessesByName("winword"))
-                {
-                    process.Kill();
-                    process.WaitForExit();
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException(nameof(Close));
-            }
+            _application.Quit();
+            Marshal.ReleaseComObject(_application);
         }
     }
 }

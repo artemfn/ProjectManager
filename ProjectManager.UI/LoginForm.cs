@@ -34,7 +34,7 @@ namespace ProjectManager.UI
                     if (user != null && user.Password == PasswordTextBox.Text)
                     {
                         Hide();
-                        new MainMenuForm(user).ShowDialog();
+                        new MainForm(user).ShowDialog();
                         Close();
                     }
                     else

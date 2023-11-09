@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.IO;
+using ProjectManager.BL.Data;
 
 namespace ProjectManager.BL.Model
 {
     [Serializable]
     public class Project
     {
+        [NonSerialized] private DirectoryController _directoryController;
+
         private readonly List<ProjectFile> _files;
 
 
@@ -21,20 +24,21 @@ namespace ProjectManager.BL.Model
             if (string.IsNullOrEmpty(description))
                 throw new ArgumentNullException(nameof(description));
 
+            _directoryController = new DirectoryController();
             _files = new List<ProjectFile>();
             Path = path;
             Name = name;
             Description = description;
 
-            TryCreateDirectory(DirectoryPath);
+            TryCreateDirectory(FullPath);
         }
 
 
-        public string Path { get; }
         public string Name { get; }
+        public string Path { get; }
         public string Description { get; }
 
-        private string DirectoryPath => $@"{Path}\{Name}";
+        public string FullPath => $@"{Path}\{Name}";
 
 
         public void Add(ProjectFile file)
@@ -63,18 +67,13 @@ namespace ProjectManager.BL.Model
                 }
             }
 
-            if (Directory.Exists(DirectoryPath))
-            {
-                Directory.Delete(DirectoryPath);
-            }
+            _directoryController = new DirectoryController();
+            _directoryController.TryDelete(FullPath);
         }
 
         private void TryCreateDirectory(string path)
         {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            _directoryController.TryCreate(path);
         }
 
         public override string ToString()

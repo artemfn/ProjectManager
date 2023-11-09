@@ -53,7 +53,7 @@ namespace ProjectManager.UI
                 MessageBox.Show("User did sing in!", "Singin", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 Hide();
-                new MainMenuForm(_user).ShowDialog();
+                new MainForm(_user).ShowDialog();
                 Close();
             }
         }

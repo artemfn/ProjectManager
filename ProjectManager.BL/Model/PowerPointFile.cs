@@ -1,22 +1,30 @@
-﻿using Microsoft.Office.Interop.PowerPoint;
-using Microsoft.Office.Core;
+﻿using Microsoft.Office.Core;
+using Microsoft.Office.Interop.PowerPoint;
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ProjectManager.BL.Model
 {
+    [Serializable]
     public sealed class PowerPointFile : ProjectFile
     {
         private readonly Application _application;
         private readonly Presentation _presentation;
 
 
-        public PowerPointFile(string path) : base(path)
+        public PowerPointFile(string name, string path, MsoTriState visible) : base(name, path)
+        {
+            _application = new Application();
+            _presentation = _application.Presentations.Add(MsoTriState.msoTrue);
+        }
+
+        public PowerPointFile(string fullPath, MsoTriState visible) : base(fullPath)
         {
             _application = new Application()
             {
-                Visible = MsoTriState.msoTrue
+                Visible = visible
             };
             _presentation = _application.Presentations.Add(MsoTriState.msoTrue);
         }
@@ -24,18 +32,15 @@ namespace ProjectManager.BL.Model
 
         public override void Save()
         {
-            if (!File.Exists(Path))
+            if (!File.Exists(FullPath))
             {
-                while (true)
+                try
                 {
-                    try
-                    {
-                        _presentation.SaveAs(Path, PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
-                    }
-                    catch (IOException e)
-                    {
-                        throw new InvalidOperationException(nameof(Save), e);
-                    }
+                    _presentation.SaveAs(FullPath, PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                }
+                catch (IOException e)
+                {
+                    throw new InvalidOperationException(nameof(Save), e);
                 }
             }
             else
@@ -46,13 +51,13 @@ namespace ProjectManager.BL.Model
 
         public override void Open()
         {
-            if (File.Exists(Path))
+            if (File.Exists(FullPath))
             {
                 while (true)
                 {
                     try
                     {
-                        _application.Presentations.Open(Path);
+                        _application.Presentations.Open(FullPath);
                         return;
                     }
                     catch (Exception e)
@@ -65,20 +70,9 @@ namespace ProjectManager.BL.Model
             throw new InvalidOperationException(nameof(Open));
         }
 
-        public override void Close()
+        public override void Dispose()
         {
-            if (File.Exists(Path))
-            {
-                foreach (var process in Process.GetProcesses("powerpnt"))
-                {
-                    process.Kill();
-                    process.WaitForExit();
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException(nameof(Close));
-            }
+            // ???
         }
     }
 }
