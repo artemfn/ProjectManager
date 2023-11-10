@@ -225,6 +225,13 @@ namespace ProjectManager.UI
 
         private void ProfileMenuItem_Click(object sender, EventArgs e)
         {
+            var form = new ProfileForm(_user);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                _serializationProvider.SaveOrReplace($@"C:\Users\Admin\Desktop\Projects.cs\ProjectManager\ProjectManager.UI\bin\Debug\users\{_user.Name}\Data",
+                    form.GetChangedUserModel());
+            }
         }
     }
 }

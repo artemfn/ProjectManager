@@ -48,7 +48,6 @@
     <Compile Include="Model\Project.cs" />
     <Compile Include="Model\ProjectFile.cs" />
     <Compile Include="Model\User.cs" />
-    <Compile Include="Model\UserType.cs" />
     <Compile Include="Model\WordFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

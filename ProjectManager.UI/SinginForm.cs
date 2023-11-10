@@ -13,7 +13,6 @@ namespace ProjectManager.UI
         private readonly DirectoryController _directoryController = new DirectoryController();
         private readonly User _user = new User();
 
-        private bool _isDescriptionAdded = false;
         private string _description;
 
 
@@ -28,8 +27,7 @@ namespace ProjectManager.UI
 
             if (descriptionForm.ShowDialog() == DialogResult.OK)
             {
-                _isDescriptionAdded = true;
-                _description = descriptionForm.GetDescription(_isDescriptionAdded);
+                _description = descriptionForm.GetDescription();
             }
         }
 
@@ -44,7 +42,7 @@ namespace ProjectManager.UI
                 !string.IsNullOrEmpty(UserTypeComboBox.Text))
             {
                 _user.Set(NameTextBox.Text, PasswordTextBox.Text, EmailTextBox.Text,
-                    GetGenderValue(GenderComboBox.Text), (int)AgeNumeric.Value, _description, GetUserTypeValue(UserTypeComboBox.Text));
+                    GenderComboBox.Text, (int)AgeNumeric.Value, _description, UserTypeComboBox.Text);
 
                 _directoryController.TryCreate($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}");
                 _directoryController.TryCreate($@"{USERSDIRECTORYPATH}\{NameTextBox.Text}\Projects");
@@ -56,36 +54,6 @@ namespace ProjectManager.UI
                 new MainForm(_user).ShowDialog();
                 Close();
             }
-        }
-
-        private int GetGenderValue(string gender)
-        {
-            if (string.IsNullOrEmpty(gender)) 
-                throw new ArgumentNullException(nameof(gender));
-
-            if (gender == "Man")
-                return 1;
-            else if (gender == "Women")
-                return -1;
-            else
-                return 0;
-        }
-
-        private UserType GetUserTypeValue(string type)
-        {
-            if (string.IsNullOrEmpty(type))
-                throw new ArgumentNullException(nameof(type));
-
-            if (type == "Ordinary")
-                return UserType.Ordinary;
-            else if (type == "Student")
-                return UserType.Student;
-            else if (type == "Teacher")
-                return UserType.Teacher;
-            else if (type == "Company")
-                return UserType.Company;
-            else
-                return UserType.Other;
         }
     }
 }

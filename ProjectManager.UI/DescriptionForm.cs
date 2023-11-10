@@ -7,13 +7,19 @@ namespace ProjectManager.UI
         private string _description;
 
 
-        public DescriptionForm()
+        public DescriptionForm(string description = null)
         {
             InitializeComponent();
+
+            if (description != null)
+            {
+                DescriptionTextBox.Text = description;
+                _description = description;
+            }
         }
 
 
-        public string GetDescription(bool target)
+        public string GetDescription()
         {
             return _description;
         }
